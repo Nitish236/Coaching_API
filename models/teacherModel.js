@@ -26,6 +26,11 @@ const teacherSchema = new mongoose.Schema(
     password: {
       type: String,
     },
+    rooms: [
+      {
+        type: String,
+      },
+    ],
     role: {
       type: String,
       default: "Teacher",
@@ -41,10 +46,6 @@ const teacherSchema = new mongoose.Schema(
         type: Number,
         required: [true, "Experience cannot be empty"],
       },
-    },
-    address: {
-      type: String,
-      required: [true, "Address is required"],
     },
     subjects: {
       type: Array,
@@ -71,8 +72,8 @@ teacherSchema.pre("save", async function () {
     context: {
       userName: this.name,
       userEmail: this.email,
-      userPassword: pass,
       role: this.role,
+      userPassword: pass,
     },
   };
 

@@ -1,18 +1,18 @@
 require("dotenv").config();
 
 const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
 const generatePass = require("generate-password");
 const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt");
-const sendEmail = require("../utils/mailService/email");
+const sendEmail = require("../mailService/email");
 
-// Student Schema
+// Data Entry Operator Schema
 
-const studentSchema = new mongoose.Schema(
+const dataEntryOperatorSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: [true, "Student name is required"],
+      required: [true, "Data Entry Operator Name is required"],
     },
     email: {
       type: String,
@@ -28,32 +28,18 @@ const studentSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      default: "Student",
+      default: "Data Entry Operator",
     },
-    age:{
+    age: {
       type: Number,
     },
-    classYr: {
-      type: String,
-      required: [true, "Class is required"],
-    },
-    subjects: {
-      type: Array,
-    },
-    parentContact: {
+    contact: {
       type: Number,
-      required: [true, "Parent contact number is required"],
-    },
-    studentContact: {
-      type: Number,
-      required: [true, "Student contact number is required"],
+      required: [true, "Contact Number is required"],
     },
     address: {
       type: String,
       required: [true, "Address is required"],
-    },
-    room: {
-      type: String,
     },
   },
   { timestamps: true }
@@ -61,7 +47,7 @@ const studentSchema = new mongoose.Schema(
 
 // To auto-generate and save password
 
-studentSchema.pre("save", async function () {
+dataEntryOperatorSchema.pre("save", async function () {
   // Generate a random password
   const pass = generatePass.generate({
     length: 8,
@@ -90,7 +76,7 @@ studentSchema.pre("save", async function () {
 
 //                            Function to create Access Token
 
-studentSchema.methods.createAccessToken = async function () {
+dataEntryOperatorSchema.methods.createAccessToken = async function () {
   return jwt.sign(
     {
       userId: this._id,
@@ -104,7 +90,7 @@ studentSchema.methods.createAccessToken = async function () {
 
 //                            Function to create Refresh Token
 
-studentSchema.methods.createRefreshToken = async function () {
+dataEntryOperatorSchema.methods.createRefreshToken = async function () {
   return jwt.sign(
     { userId: this._id, name: this.name },
     process.env.REFRESH_TOKEN_SECRET,
@@ -114,12 +100,12 @@ studentSchema.methods.createRefreshToken = async function () {
 
 //                            Function to compare password
 
-studentSchema.methods.comparePassword = async function (pass) {
+dataEntryOperatorSchema.methods.comparePassword = async function (pass) {
   const isMatch = await bcrypt.compare(pass, this.password);
 
   return isMatch;
 };
 
-// Student Model
+// Export model
 
-module.exports = mongoose.model("Student", studentSchema);
+module.exports = mongoose.model("DataEntryOperator", dataEntryOperatorSchema);
